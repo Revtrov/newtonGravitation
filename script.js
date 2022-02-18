@@ -32,42 +32,44 @@ let slope = (obj1, obj2) => {
     return 1 * ((y2 - y1) / (x2 - x1));
 }
 let attract = (obj1, obj2) => {
-    if (obj1.x != obj2.x && obj1.y != obj2.y && obj1.x > 0 && obj1.y > 0 && obj1.x < canvas.width / euclidAlg() && obj1.y < canvas.height / euclidAlg()) {
-        let y = slope(obj1, obj2);
-        let x = 1;
-        let xDif = obj1.x - obj2.x;
-        let yDif = obj1.y - obj2.y;
-        if (y < 0 && xDif > 0 & yDif < 0) {
-            //p1 bottom right;
-            obj1.x -= x;
-            obj1.y += Math.abs(slope(obj1, obj2));
-            obj2.x += x;
-            obj2.y -= Math.abs(slope(obj1, obj2));
+    try {
+        if (obj1.x != obj2.x && obj1.y != obj2.y && obj1.x > 0 && obj1.y > 0 && obj1.x < canvas.width / euclidAlg() && obj1.y < canvas.height / euclidAlg()) {
+            let y = slope(obj1, obj2);
+            let x = 1;
+            let xDif = obj1.x - obj2.x;
+            let yDif = obj1.y - obj2.y;
+            if (y < 0 && xDif > 0 & yDif < 0) {
+                //p1 bottom right;
+                obj1.x -= x;
+                obj1.y += Math.abs(slope(obj1, obj2));
+                obj2.x += x;
+                obj2.y -= Math.abs(slope(obj1, obj2));
+            }
+            if (y > 0 && xDif < 0 & yDif < 0) {
+                //p1 bottom left;
+                obj1.x += x;
+                obj1.y += Math.abs(slope(obj1, obj2));
+                obj2.x -= x;
+                obj2.y -= Math.abs(slope(obj1, obj2));
+            }
+            if (y < 0 && xDif < 0 & yDif > 0) {
+                //p1 top left;
+                obj1.x += x;
+                obj1.y -= Math.abs(slope(obj1, obj2));
+                obj2.x -= x;
+                obj2.y += Math.abs(slope(obj1, obj2));
+            }
+            if (y > 0 && xDif > 0 & yDif > 0) {
+                //p1 top right;
+                obj1.x -= x;
+                obj1.y -= Math.abs(slope(obj1, obj2));
+                obj2.x += x;
+                obj2.y += Math.abs(slope(obj1, obj2));
+            }
+        } else {
+            reset([obj1, obj2])
         }
-        if (y > 0 && xDif < 0 & yDif < 0) {
-            //p1 bottom left;
-            obj1.x += x;
-            obj1.y += Math.abs(slope(obj1, obj2));
-            obj2.x -= x;
-            obj2.y -= Math.abs(slope(obj1, obj2));
-        }
-        if (y < 0 && xDif < 0 & yDif > 0) {
-            //p1 top left;
-            obj1.x += x;
-            obj1.y -= Math.abs(slope(obj1, obj2));
-            obj2.x -= x;
-            obj2.y += Math.abs(slope(obj1, obj2));
-        }
-        if (y > 0 && xDif > 0 & yDif > 0) {
-            //p1 top right;
-            obj1.x -= x;
-            obj1.y -= Math.abs(slope(obj1, obj2));
-            obj2.x += x;
-            obj2.y += Math.abs(slope(obj1, obj2));
-        }
-    } else {
-        reset([obj1, obj2])
-    }
+    } catch (e) { null }
 }
 
 function getRandomInt(min, max) {
@@ -164,7 +166,7 @@ let reset = (objs) => {
     }
 }
 let objects = [];
-let objCount = 8999;
+let objCount = 999;
 for (let i = 0; i < objCount; i++) {
     objects.push(new Object(3, 0, 0, 0, 0, 0))
 }
