@@ -2,6 +2,7 @@ let canvas = document.getElementById("canvas"),
     ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+let v = 0.1;
 let newtonGravition = (G, m1, m2, d) => {
     return ((G * m2 * m1) / (d * d));
 }
@@ -26,6 +27,54 @@ let euclidAlg = () => {
     }
     return num
 }
+let slope = (obj1, obj2) => {
+    let [x1, y1] = [(obj1.x), (obj1.y)], [x2, y2] = [(obj2.x), (obj2.y)];
+    return 1 * ((y2 - y1) / (x2 - x1));
+}
+let attract = (obj1, obj2) => {
+    if (obj1.x != obj2.x && obj1.y != obj2.y && obj1.x > 0 && obj1.y > 0 && obj1.x < canvas.width / euclidAlg() && obj1.y < canvas.height / euclidAlg()) {
+        let y = slope(obj1, obj2);
+        let x = 1;
+        let xDif = obj1.x - obj2.x;
+        let yDif = obj1.y - obj2.y;
+        if (y < 0 && xDif > 0 & yDif < 0) {
+            //p1 bottom right;
+            obj1.x -= x;
+            obj1.y += Math.abs(slope(obj1, obj2));
+            obj2.x += x;
+            obj2.y -= Math.abs(slope(obj1, obj2));
+        }
+        if (y > 0 && xDif < 0 & yDif < 0) {
+            //p1 bottom left;
+            obj1.x += x;
+            obj1.y += Math.abs(slope(obj1, obj2));
+            obj2.x -= x;
+            obj2.y -= Math.abs(slope(obj1, obj2));
+        }
+        if (y < 0 && xDif < 0 & yDif > 0) {
+            //p1 top left;
+            obj1.x += x;
+            obj1.y -= Math.abs(slope(obj1, obj2));
+            obj2.x -= x;
+            obj2.y += Math.abs(slope(obj1, obj2));
+        }
+        if (y > 0 && xDif > 0 & yDif > 0) {
+            //p1 top right;
+            obj1.x -= x;
+            obj1.y -= Math.abs(slope(obj1, obj2));
+            obj2.x += x;
+            obj2.y += Math.abs(slope(obj1, obj2));
+        }
+    } else {
+        reset([obj1, obj2])
+    }
+}
+
+function getRandomInt(min, max) {
+    min = Math.ceil(min);
+    max = Math.floor(max);
+    return Math.floor(Math.random() * (max - min) + min); //The maximum is exclusive and the minimum is inclusive
+}
 let drawGrid = () => {
     let num = euclidAlg();
     for (let i = 0; i <= canvas.width / num; i++) {
@@ -33,17 +82,15 @@ let drawGrid = () => {
         ctx.lineWidth = 1;
         if ((canvas.width / euclidAlg()) % 2 != 0) {
             if (Math.floor(((canvas.width / euclidAlg()) / 2) + 1) != Math.floor(i)) {
-                console.log("a")
-                ctx.strokeStyle = "red";
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
             } else {
-                ctx.strokeStyle = "black";
-                console.log("b")
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
             }
         } else {
             if (i == ((canvas.width / euclidAlg()) / 2)) {
-                ctx.strokeStyle = "black";
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
             } else {
-                ctx.strokeStyle = "red";
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
             }
         }
         ctx.moveTo((num) * i, 0);
@@ -55,13 +102,13 @@ let drawGrid = () => {
         ctx.lineWidth = 1;
         if ((canvas.height / euclidAlg()) % 2 != 0) {
             if (Math.floor(((canvas.height / euclidAlg()) / 2) + 1) != Math.floor(i)) {
-                ctx.strokeStyle = "red";
-            } else { ctx.strokeStyle = "black" }
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+            } else { ctx.strokeStyle = "rgba(255, 255, 255, 0.6)" }
         } else {
             if (i == ((canvas.height / euclidAlg()) / 2)) {
-                ctx.strokeStyle = "black";
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
             } else {
-                ctx.strokeStyle = "red";
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
             }
         }
         ctx.moveTo(0, (num) * i);
@@ -71,7 +118,7 @@ let drawGrid = () => {
 }
 let drawConnection = (obj1, obj2) => {
     ctx.beginPath();
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 3;
     ctx.strokeStyle = "red";
     ctx.moveTo(obj1.x * euclidAlg(), obj1.y * euclidAlg());
     ctx.lineTo(obj2.x * euclidAlg(), obj2.y * euclidAlg());
@@ -104,14 +151,38 @@ class Object {
         ctx.stroke();
     }
 }
-let objects = [new Object(1, 0, 0, 0, 10, 10), new Object(1, 0, 0, 0, 0, 0)]
+let reset = (objs) => {
+    for (i = 0; i < objects.length; i++) {
+        if (objects[i] === objs[1]) {
+            objects.splice(objects.indexOf(objs[1]), 1)
+            objs.splice(objs.indexOf(objs[1]))
+        }
+    }
+    for (let i = 0; i < objs.length; i++) {
+        objs[i].x = getRandomInt(0, (canvas.width / euclidAlg()) * 1);
+        objs[i].y = getRandomInt(0, (canvas.height / euclidAlg()) * 1);
+    }
+}
+let objects = [];
+let objCount = 8999;
+for (let i = 0; i < objCount; i++) {
+    objects.push(new Object(3, 0, 0, 0, 0, 0))
+}
+
+for (let i = 0; i < objects.length; i++) {
+    objects[i].x = getRandomInt(0, (canvas.width / euclidAlg()) * 1);
+    objects[i].y = getRandomInt(0, (canvas.height / euclidAlg()) * 1);
+}
 let loop = setInterval(() => {
-    ctx.fillStyle = "white";
+    ctx.fillStyle = "black";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     drawGrid();
-    drawConnection(objects[0], objects[1]);
+    for (let i = 0; i < objects.length; i += 2) {
+        attract(objects[i], objects[i + 1])
+            //drawConnection(objects[i], objects[i + 1]);
+    }
     for (let i = 0; i < objects.length; i++) {
-        objects[i].draw("blue", "green", 1)
+        objects[i].draw("red", "blue", 1)
     }
 
-}, 1)
+})
