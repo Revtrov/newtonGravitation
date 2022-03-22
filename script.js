@@ -2,6 +2,9 @@ let canvas = document.getElementById("canvas"),
     ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
+
+ctx.fillStyle = "black";
+ctx.fillRect(0, 0, canvas.width, canvas.height);
 let v = 0.1;
 let newtonGravition = (G, m1, m2, d) => {
     return ((G * m2 * m1) / (d * d));
@@ -121,11 +124,11 @@ let drawGrid = () => {
 let drawConnection = (obj1, obj2) => {
     ctx.beginPath();
     ctx.lineWidth = 3;
-    ctx.shadowBlur = 40;
+    ctx.shadowBlur = 5;
     ctx.shadowColor = "rgb(155, 155, 155)";
     ctx.shadowOffsetX = 0;
     ctx.shadowOffsetY = 0;
-    ctx.strokeStyle = "rgb(155, 155, 155)";
+    ctx.strokeStyle = "white";
     ctx.moveTo(obj1.x * euclidAlg(), obj1.y * euclidAlg());
     ctx.lineTo(obj2.x * euclidAlg(), obj2.y * euclidAlg());
     ctx.stroke();
@@ -153,9 +156,11 @@ class Object {
         ctx.strokeStyle = color;
         ctx.lineWidth = lineThickness;
         ctx.fillStyle = this.objColor;
+        //ctx.font = '48px serif';
+        //ctx.fillText('HELLO WORLD', this.x * euclidAlg(), this.y * euclidAlg());
         ctx.arc(this.x * euclidAlg(), this.y * euclidAlg(), euclidAlg() * this.r, 0, 2 * Math.PI);
-        ctx.shadowBlur = 40;
-        ctx.shadowColor = this.objColor;
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = "black";
         ctx.shadowOffsetX = 0;
         ctx.shadowOffsetY = 0;
         ctx.fill();
@@ -163,17 +168,18 @@ class Object {
     }
 }
 let reset = (objs) => {
-    let newR = (objs[0].r + objs[1].r);
+    let newR = (objs[0].r + objs[1].r) * 1.1;
     //if (objs[0].objColor != objs[1].objColor) {
-    for (i = 0; i < objects.length; i++) {
-        if (objects[i] === objs[1]) {
-            let num = getRandomInt(0, 2);
-            objects.splice(objects.indexOf(objs[num]), 1)
-            objs.splice(objs.indexOf(objs[num]))
-        }
-    }
+    // for (i = 0; i < objects.length; i++) {
+    //     if (objects[i] === objs[1]) {
+    //         let num = getRandomInt(0, 2);
+    //         objects.splice(objects.indexOf(objs[num]), 1)
+    //         objs.splice(objs.indexOf(objs[num]))
+    //     }
+    // }
     for (let i = 0; i < objs.length; i++) {
-        objs[i].r = newR;
+        //if (newR < 50) { objs[i].r = newR; }
+        objs[i].objColor = `rgba(${newR}, 255, 0)`;
         objs[i].x = getRandomInt(0, (canvas.width / euclidAlg()) * 1);
         objs[i].y = getRandomInt(0, (canvas.height / euclidAlg()) * 1);
     }
@@ -188,7 +194,7 @@ let objects = [];
 let objCount = 998;
 let colArray = [];
 let colRingArray = [];
-colors = ["red", "blue"]
+colors = ["green", "green"]
 
 var video = document.getElementById("video");
 var stream = canvas.captureStream();
@@ -211,7 +217,7 @@ for (let i = 0; i < objCount; i++) {
     }
 }
 for (let i = 0; i < objCount; i++) {
-    objects.push(new Object(getRandomInt(1, 3), 3, 0, 0, 0, 0, colors[colArray[i]], colors[colRingArray[i]]))
+    objects.push(new Object(getRandomInt(1, 3), 1, 0, 0, 0, 0, colors[colArray[i]], colors[colRingArray[i]]))
 }
 
 for (let i = 0; i < objects.length; i++) {
@@ -220,11 +226,11 @@ for (let i = 0; i < objects.length; i++) {
 }
 let loop = setInterval(() => {
     ctx.fillStyle = "black";
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-    drawGrid();
+    //ctx.fillRect(0, 0, canvas.width, canvas.height);
+    //drawGrid();
     try {
         for (let i = 0; i < objects.length; i += 2) {
-            drawConnection(objects[i], objects[i + 1]);
+            //drawConnection(objects[i], objects[i + 1]);
             attract(objects[i], objects[i + 1])
         }
     } catch { null }
