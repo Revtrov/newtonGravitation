@@ -87,15 +87,15 @@ let drawGrid = () => {
         ctx.lineWidth = 1;
         if ((canvas.width / euclidAlg()) % 2 != 0) {
             if (Math.floor(((canvas.width / euclidAlg()) / 2) + 1) != Math.floor(i)) {
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
             } else {
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
             }
         } else {
             if (i == ((canvas.width / euclidAlg()) / 2)) {
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
             } else {
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
             }
         }
         ctx.moveTo((num) * i, 0);
@@ -107,13 +107,13 @@ let drawGrid = () => {
         ctx.lineWidth = 1;
         if ((canvas.height / euclidAlg()) % 2 != 0) {
             if (Math.floor(((canvas.height / euclidAlg()) / 2) + 1) != Math.floor(i)) {
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
-            } else { ctx.strokeStyle = "rgba(255, 255, 255, 0.6)" }
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
+            } else { ctx.strokeStyle = "rgba(0, 0, 0, 0.1)" }
         } else {
             if (i == ((canvas.height / euclidAlg()) / 2)) {
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
             } else {
-                ctx.strokeStyle = "rgba(255, 255, 255, 0.1)";
+                ctx.strokeStyle = "rgba(0, 0, 0, 0.1)";
             }
         }
         ctx.moveTo(0, (num) * i);
@@ -134,12 +134,13 @@ let drawConnection = (obj1, obj2) => {
     ctx.stroke();
 }
 class Object {
-    constructor(_r, _v, _a, _m, _x, _y, _objColor) {
+    constructor(_r, _v, _a, _m, _x, _y, _objColor, _dirX) {
         this.r = _r;
         this.v = _v;
         this.a = _a;
         this.m = _m;
         this.objColor = _objColor;
+        this.dirX = _dirX
         if ((canvas.height / euclidAlg()) % 2 != 0) {
             this.y = Math.floor(((canvas.height / euclidAlg()) / 2) + 1) + _y * -1;
         } else {
@@ -151,6 +152,14 @@ class Object {
             this.x = ((canvas.width / euclidAlg()) / 2) + _x;
         }
     }
+    move() {
+        if (this.dirX == 0) {
+            this.x -= getRandomInt(0, 10);
+        } else if (this.dirX == 1) {
+            this.x += getRandomInt(0, 10);
+        }
+        this.y *= 1.00001
+    }
     draw(color, lineThickness) {
         ctx.beginPath();
         ctx.strokeStyle = color;
@@ -159,6 +168,10 @@ class Object {
         //ctx.font = '48px serif';
         //ctx.fillText('HELLO WORLD', this.x * euclidAlg(), this.y * euclidAlg());
         ctx.arc(this.x * euclidAlg(), this.y * euclidAlg(), euclidAlg() * this.r, 0, 2 * Math.PI);
+        //ctx.moveTo(this.x * euclidAlg(), this.y * euclidAlg());
+        //ctx.lineTo(this.x * euclidAlg() + 10, this.y + 10);
+        //ctx.lineTo(this.x * euclidAlg() - 10, this.y + 10);
+        //ctx.lineTo(this.x * euclidAlg(), this.y * euclidAlg());
         ctx.shadowBlur = 5;
         ctx.shadowColor = "black";
         ctx.shadowOffsetX = 0;
@@ -179,7 +192,7 @@ let reset = (objs) => {
     // }
     for (let i = 0; i < objs.length; i++) {
         //if (newR < 50) { objs[i].r = newR; }
-        objs[i].objColor = `rgba(${newR}, 255, 0)`;
+        objs[i].objColor = `rgba(${/*newR*/0}, 0, 0)`;
         objs[i].x = getRandomInt(0, (canvas.width / euclidAlg()) * 1);
         objs[i].y = getRandomInt(0, (canvas.height / euclidAlg()) * 1);
     }
@@ -191,10 +204,10 @@ let reset = (objs) => {
     // }
 }
 let objects = [];
-let objCount = 998;
+let objCount = 98;
 let colArray = [];
 let colRingArray = [];
-colors = ["green", "green"]
+colors = ["black", "black"]
 
 var video = document.getElementById("video");
 var stream = canvas.captureStream();
@@ -216,8 +229,9 @@ for (let i = 0; i < objCount; i++) {
         colRingArray.push(1);
     }
 }
+let sizes = [1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3]
 for (let i = 0; i < objCount; i++) {
-    objects.push(new Object(getRandomInt(1, 3), 1, 0, 0, 0, 0, colors[colArray[i]], colors[colRingArray[i]]))
+    objects.push(new Object( /*sizes[getRandomInt(0, sizes.length)]*/ getRandomInt(1, 20), 2, 0, 0, 0, 0, colors[colArray[i]], getRandomInt(0, 2)))
 }
 
 for (let i = 0; i < objects.length; i++) {
@@ -227,14 +241,15 @@ for (let i = 0; i < objects.length; i++) {
 let loop = setInterval(() => {
     ctx.fillStyle = "black";
     //ctx.fillRect(0, 0, canvas.width, canvas.height);
-    //drawGrid();
+    drawGrid();
     try {
         for (let i = 0; i < objects.length; i += 2) {
-            //drawConnection(objects[i], objects[i + 1]);
+            drawConnection(objects[i], objects[i + 1]);
             attract(objects[i], objects[i + 1])
         }
     } catch { null }
     for (let i = 0; i < objects.length; i += 1) {
-        objects[i].draw(1)
+        objects[i].draw("black", 0.1)
+        objects[i].move()
     }
 }, )
