@@ -10,7 +10,7 @@ let newtonGravition = (G, m1, m2, d) => {
     return ((G * m2 * m1) / (d * d));
 }
 let distanceFormula = (x1, y1, x2, y2) => {
-    return Math.sqrt(Math.pow(x2 - x1) + Math.pow(y2 - y1));
+    return Math.sqrt(Math.pow(x2 - x1,2) + Math.pow(y2 - y1,2));
 }
 let midPoint = (obj1, obj2) => {
     let [x1, y1] = [(obj1.x), (obj1.y)], [x2, y2] = [(obj2.x), (obj2.y)];
@@ -36,7 +36,13 @@ let slope = (obj1, obj2) => {
 }
 let attract = (obj1, obj2) => {
     try {
-        if (obj1.x != obj2.x && obj1.y != obj2.y && obj1.x > 0 && obj1.y > 0 && obj1.x < canvas.width / euclidAlg() && obj1.y < canvas.height / euclidAlg()) {
+        //for(let i =0; i<objects.length;i++){
+        //    if(distanceFormula(obj1.x, obj1.y, objects[i].x, objects[i].y)>obj1.r+objects[i].r){
+        //        objects[i].x+=obj1.r
+        //    }
+        //}
+        if(distanceFormula(obj1.x, obj1.y, obj2.x, obj2.y)>obj1.r+obj2.r){
+        if (obj1.x != obj2.x && obj1.y != obj2.y && obj1.x > 0 && obj1.y > 0 &&obj2.x > 0 && obj2.y > 0&& obj1.x < canvas.width / euclidAlg() && obj1.y < canvas.height / euclidAlg()&& obj2.x < canvas.width / euclidAlg() && obj2.y < canvas.height / euclidAlg()) {
             let y = slope(obj1, obj2);
             let x = 1 * obj1.v;
             let xDif = obj1.x - obj2.x;
@@ -69,9 +75,13 @@ let attract = (obj1, obj2) => {
                 obj2.x += x;
                 obj2.y += obj2.v * Math.abs(slope(obj1, obj2));
             }
-        } else {
+        }
+         else {
+            reset([obj1, obj2])
+        }}else {
             reset([obj1, obj2])
         }
+    
     } catch (e) { null }
 }
 
@@ -123,7 +133,7 @@ let drawGrid = () => {
 }
 let drawConnection = (obj1, obj2) => {
     ctx.beginPath();
-    ctx.lineWidth = 3;
+    ctx.lineWidth = (obj1.r+obj2.r)/2;
     ctx.shadowBlur = 5;
     ctx.shadowColor = "rgb(155, 155, 155)";
     ctx.shadowOffsetX = 0;
@@ -181,7 +191,7 @@ class Object {
     }
 }
 let reset = (objs) => {
-    let newR = (objs[0].r + objs[1].r) * 1.1;
+    let newR = /*(objs[0].r + objs[1].r) * 1.1*/getRandomInt(0,10);
     //if (objs[0].objColor != objs[1].objColor) {
     // for (i = 0; i < objects.length; i++) {
     //     if (objects[i] === objs[1]) {
@@ -191,8 +201,8 @@ let reset = (objs) => {
     //     }
     // }
     for (let i = 0; i < objs.length; i++) {
-        //if (newR < 50) { objs[i].r = newR; }
-        objs[i].objColor = `rgba(${/*newR*/0}, 0, 0)`;
+        if (newR < 50) { objs[i].r = newR; }
+        objs[i].objColor = `rgba(${/*newR*/getRandomInt(0,255)}, ${/*newR*/getRandomInt(0,255)}, ${/*newR*/getRandomInt(0,255)})`;
         objs[i].x = getRandomInt(0, (canvas.width / euclidAlg()) * 1);
         objs[i].y = getRandomInt(0, (canvas.height / euclidAlg()) * 1);
     }
@@ -204,10 +214,10 @@ let reset = (objs) => {
     // }
 }
 let objects = [];
-let objCount = 98;
+let objCount = 998;
 let colArray = [];
 let colRingArray = [];
-colors = ["black", "black"]
+colors = ["green", "green"]
 
 var video = document.getElementById("video");
 var stream = canvas.captureStream();
@@ -231,7 +241,7 @@ for (let i = 0; i < objCount; i++) {
 }
 let sizes = [1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 3, 3, 3]
 for (let i = 0; i < objCount; i++) {
-    objects.push(new Object( /*sizes[getRandomInt(0, sizes.length)]*/ getRandomInt(1, 20), 2, 0, 0, 0, 0, colors[colArray[i]], getRandomInt(0, 2)))
+    objects.push(new Object( /*sizes[getRandomInt(0, sizes.length)]*/ getRandomInt(1, 1), 2, 0, 0, 0, 0, colors[colArray[i]], getRandomInt(0, 2)))
 }
 
 for (let i = 0; i < objects.length; i++) {
@@ -244,12 +254,12 @@ let loop = setInterval(() => {
     drawGrid();
     try {
         for (let i = 0; i < objects.length; i += 2) {
-            drawConnection(objects[i], objects[i + 1]);
+            //drawConnection(objects[i], objects[i + 1]);
             attract(objects[i], objects[i + 1])
         }
     } catch { null }
     for (let i = 0; i < objects.length; i += 1) {
-        objects[i].draw("black", 0.1)
+        objects[i].draw("green", 0.1)
         objects[i].move()
     }
 }, )
